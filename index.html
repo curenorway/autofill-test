@@ -3,14 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Honeypot Investigation</title>
+    <title>Honeypot Comparison Test</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            max-width: 600px;
+            max-width: 1200px;
             margin: 50px auto;
             padding: 20px;
             background-color: #f5f5f5;
+        }
+        
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        @media (max-width: 768px) {
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
         }
         
         .container {
@@ -20,8 +33,35 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         
-        h1 {
+        .container h2 {
             margin-top: 0;
+            color: #333;
+            font-size: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #007bff;
+        }
+        
+        .method-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        
+        .badge-display-none {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .badge-opacity {
+            background-color: #ffc107;
+            color: #000;
+        }
+        
+        h1 {
+            text-align: center;
             color: #333;
         }
         
@@ -66,8 +106,20 @@
             background-color: #0056b3;
         }
         
-        .hidden-field {
+        /* Method 1: display: none */
+        .hidden-field-display-none {
             display: none;
+        }
+        
+        /* Method 2: opacity (client's method) */
+        .hidden-field-opacity {
+            position: absolute !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+            left: -9999px !important;
+            height: 0 !important;
+            width: 0 !important;
+            z-index: -1 !important;
         }
         
         .results {
@@ -91,9 +143,9 @@
             border: 2px solid #ffc107;
         }
         
-        .results h2 {
+        .results h3 {
             margin-top: 0;
-            font-size: 20px;
+            font-size: 18px;
         }
         
         .field-status {
@@ -102,6 +154,7 @@
             background: white;
             border-radius: 4px;
             font-family: monospace;
+            font-size: 14px;
         }
         
         .filled {
@@ -116,158 +169,214 @@
         .info-box {
             background: #e7f3ff;
             border-left: 4px solid #007bff;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .info-box h2 {
+            margin-top: 0;
+            border: none;
+            padding: 0;
+        }
+        
+        .comparison-note {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
             padding: 15px;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🔍 Honeypot Investigation Form</h1>
-        
-        <div class="info-box">
-            <strong>Test Instructions:</strong>
-            <ul style="margin: 10px 0 0 0; padding-left: 20px;">
-                <li>Try filling with browser autocomplete</li>
-                <li>Try different password managers (1Password, LastPass, Chrome, etc.)</li>
-                <li>Try on mobile devices</li>
-                <li>Try with accessibility tools (screen readers)</li>
-            </ul>
+    <h1>🔍 Honeypot Comparison Test</h1>
+    
+    <div class="info-box">
+        <h2>Test Instructions</h2>
+        <ul style="margin: 10px 0 0 0; padding-left: 20px;">
+            <li><strong>Fill both forms</strong> with the same data and see which one triggers the honeypot</li>
+            <li>Try different browsers (Chrome, Safari, Firefox, Edge)</li>
+            <li>Try on mobile devices (iOS, Android)</li>
+            <li>Try with password managers (1Password, LastPass, Chrome, etc.)</li>
+            <li>Try browser autofill/autocomplete features</li>
+        </ul>
+    </div>
+    
+    <div class="comparison-note">
+        <strong>⚠️ Key Difference:</strong>
+        <ul style="margin: 10px 0 0 0; padding-left: 20px;">
+            <li><strong>Left form:</strong> Uses <code>display: none</code> (recommended)</li>
+            <li><strong>Right form:</strong> Uses <code>opacity: 0</code> (your client's current setup)</li>
+        </ul>
+    </div>
+    
+    <div class="comparison-grid">
+        <!-- Form 1: display: none -->
+        <div class="container">
+            <h2>
+                Form 1: display: none
+                <span class="method-badge badge-display-none">SAFE</span>
+            </h2>
+            
+            <form id="testForm1">
+                <div class="form-group">
+                    <label for="name1">Name:</label>
+                    <input type="text" id="name1" name="name" placeholder="Enter your name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email1">Email:</label>
+                    <input type="email" id="email1" name="email" placeholder="your@email.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone1">Phone:</label>
+                    <input type="tel" id="phone1" name="phone" placeholder="+1 (555) 123-4567" required>
+                </div>
+                
+                <!-- HONEYPOT FIELDS (display: none) -->
+                <div class="hidden-field-display-none">
+                    <input type="text" name="phone2" id="phone2_hp1" class="hidden-field-display-none" autocomplete="off">
+                    <input type="text" name="email2" id="email2_hp1" class="hidden-field-display-none" autocomplete="off">
+                </div>
+                
+                <button type="submit">Submit Form 1</button>
+            </form>
+            
+            <div id="results1" class="results">
+                <h3 id="resultTitle1"></h3>
+                <div id="resultDetails1"></div>
+            </div>
         </div>
         
-        <form id="testForm">
-            <!-- Regular visible fields -->
-            <div class="form-group">
-                <label for="name">Name:</label>
-                <input type="text" id="name" name="name" placeholder="Enter your name" required>
-            </div>
+        <!-- Form 2: opacity: 0 (client's method) -->
+        <div class="container">
+            <h2>
+                Form 2: opacity: 0
+                <span class="method-badge badge-opacity">CLIENT'S METHOD</span>
+            </h2>
             
-            <div class="form-group">
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" placeholder="your@email.com" required>
-            </div>
+            <form id="testForm2">
+                <div class="form-group">
+                    <label for="name2">Name:</label>
+                    <input type="text" id="name2" name="name" placeholder="Enter your name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email2">Email:</label>
+                    <input type="email" id="email2" name="email" placeholder="your@email.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone2">Phone:</label>
+                    <input type="tel" id="phone2" name="phone" placeholder="+1 (555) 123-4567" required>
+                </div>
+                
+                <!-- HONEYPOT FIELDS (opacity: 0 - CLIENT'S METHOD) -->
+                <input type="text" name="phone2" id="phone2_hp2" class="hidden-field-opacity" autocomplete="off">
+                <input type="text" name="email2" id="email2_hp2" class="hidden-field-opacity" autocomplete="off">
+                
+                <button type="submit">Submit Form 2</button>
+            </form>
             
-            <div class="form-group">
-                <label for="phone">Phone:</label>
-                <input type="tel" id="phone" name="phone" placeholder="+1 (555) 123-4567" required>
+            <div id="results2" class="results">
+                <h3 id="resultTitle2"></h3>
+                <div id="resultDetails2"></div>
             </div>
-            
-            <!-- HONEYPOT FIELDS (exact replica of client's code) -->
-            <div class="hidden-field">
-                <input type="text" name="phone2" id="phone2_hp" class="hidden-field" autocomplete="off">
-                <input type="text" name="email2" id="email2_hp" class="hidden-field" autocomplete="off">
-            </div>
-            
-            <button type="submit">Submit Form</button>
-        </form>
-        
-        <div id="results" class="results">
-            <h2 id="resultTitle"></h2>
-            <div id="resultDetails"></div>
         </div>
     </div>
 
     <script>
-        // Log when page loads to detect any pre-filling
-        window.addEventListener('load', function() {
-            setTimeout(function() {
-                const phone2 = document.getElementById('phone2_hp').value;
-                const email2 = document.getElementById('email2_hp').value;
-                
-                if (phone2 || email2) {
-                    alert('⚠️ WARNING: Honeypot fields were filled on page load!\n\nphone2: ' + (phone2 || '(empty)') + '\nemail2: ' + (email2 || '(empty)'));
-                }
-            }, 500);
-        });
-        
-        document.getElementById('testForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+        // Common function to handle form submission
+        function handleFormSubmit(formId, resultsId, titleId, detailsId, honeypotId1, honeypotId2) {
+            const form = document.getElementById(formId);
             
-            const formData = new FormData(this);
-            const data = {};
-            
-            for (let [key, value] of formData.entries()) {
-                data[key] = value;
-            }
-            
-            const phone2Filled = data.phone2 && data.phone2.trim() !== '';
-            const email2Filled = data.email2 && data.email2.trim() !== '';
-            const honeypotTriggered = phone2Filled || email2Filled;
-            
-            // Show results
-            const resultsDiv = document.getElementById('results');
-            const resultTitle = document.getElementById('resultTitle');
-            const resultDetails = document.getElementById('resultDetails');
-            
-            resultsDiv.classList.remove('success', 'warning');
-            resultsDiv.classList.add('show');
-            
-            if (honeypotTriggered) {
-                resultsDiv.classList.add('warning');
-                resultTitle.innerHTML = '⚠️ HONEYPOT TRIGGERED!';
-                resultDetails.innerHTML = `
-                    <p><strong>This submission would be BLOCKED in production.</strong></p>
-                    <p>The following honeypot fields were filled:</p>
-                    <div class="field-status">
-                        <div>phone2: <span class="filled">${data.phone2 || '(empty)'}</span></div>
-                        <div>email2: <span class="filled">${data.email2 || '(empty)'}</span></div>
-                    </div>
-                    <p><strong>Regular fields submitted:</strong></p>
-                    <div class="field-status">
-                        <div>Name: ${data.name}</div>
-                        <div>Email: ${data.email}</div>
-                        <div>Phone: ${data.phone}</div>
-                    </div>
-                    <p style="margin-top: 15px; color: #856404;"><strong>🔍 Investigation hint:</strong> Check what tool/browser filled these fields!</p>
-                `;
-            } else {
-                resultsDiv.classList.add('success');
-                resultTitle.innerHTML = '✅ Form Submitted Successfully';
-                resultDetails.innerHTML = `
-                    <p><strong>Honeypot fields were NOT filled - submission allowed!</strong></p>
-                    <div class="field-status">
-                        <div>phone2: <span class="empty">(empty) ✓</span></div>
-                        <div>email2: <span class="empty">(empty) ✓</span></div>
-                    </div>
-                    <p><strong>Regular fields submitted:</strong></p>
-                    <div class="field-status">
-                        <div>Name: ${data.name}</div>
-                        <div>Email: ${data.email}</div>
-                        <div>Phone: ${data.phone}</div>
-                    </div>
-                `;
-            }
-            
-            // Scroll to results
-            resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        });
-        
-        // Monitor for any JavaScript that might be filling the honeypot fields
-        const observer = new MutationObserver(function(mutations) {
-            mutations.forEach(function(mutation) {
-                if (mutation.type === 'attributes' && mutation.attributeName === 'value') {
-                    const target = mutation.target;
-                    if (target.id === 'phone2_hp' || target.id === 'email2_hp') {
-                        console.warn('⚠️ Honeypot field value changed by JavaScript:', target.id, '=', target.value);
+            // Monitor for page load autofill
+            window.addEventListener('load', function() {
+                setTimeout(function() {
+                    const phone2 = document.getElementById(honeypotId1).value;
+                    const email2 = document.getElementById(honeypotId2).value;
+                    
+                    if (phone2 || email2) {
+                        alert(`⚠️ WARNING (${formId}): Honeypot fields were filled on page load!\n\nphone2: ${phone2 || '(empty)'}\nemail2: ${email2 || '(empty)'}`);
                     }
+                }, 500);
+            });
+            
+            // Monitor for real-time changes
+            [honeypotId1, honeypotId2].forEach(id => {
+                const input = document.getElementById(id);
+                input.addEventListener('input', function() {
+                    console.warn(`⚠️ ${formId} - Honeypot field INPUT event:`, this.id, '=', this.value);
+                    alert(`⚠️ ${formId} - Honeypot field was just filled: ${this.id} = "${this.value}"`);
+                });
+            });
+            
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(this);
+                const data = {};
+                
+                for (let [key, value] of formData.entries()) {
+                    data[key] = value;
                 }
+                
+                const phone2Filled = document.getElementById(honeypotId1).value.trim() !== '';
+                const email2Filled = document.getElementById(honeypotId2).value.trim() !== '';
+                const honeypotTriggered = phone2Filled || email2Filled;
+                
+                // Show results
+                const resultsDiv = document.getElementById(resultsId);
+                const resultTitle = document.getElementById(titleId);
+                const resultDetails = document.getElementById(detailsId);
+                
+                resultsDiv.classList.remove('success', 'warning');
+                resultsDiv.classList.add('show');
+                
+                if (honeypotTriggered) {
+                    resultsDiv.classList.add('warning');
+                    resultTitle.innerHTML = '⚠️ HONEYPOT TRIGGERED!';
+                    resultDetails.innerHTML = `
+                        <p><strong>This submission would be BLOCKED in production.</strong></p>
+                        <p>The following honeypot fields were filled:</p>
+                        <div class="field-status">
+                            <div>phone2: <span class="filled">${document.getElementById(honeypotId1).value || '(empty)'}</span></div>
+                            <div>email2: <span class="filled">${document.getElementById(honeypotId2).value || '(empty)'}</span></div>
+                        </div>
+                        <p><strong>Regular fields submitted:</strong></p>
+                        <div class="field-status">
+                            <div>Name: ${data.name}</div>
+                            <div>Email: ${data.email}</div>
+                            <div>Phone: ${data.phone}</div>
+                        </div>
+                        <p style="margin-top: 15px; color: #856404;"><strong>🔍 Investigation hint:</strong> Check what tool/browser filled these fields!</p>
+                    `;
+                } else {
+                    resultsDiv.classList.add('success');
+                    resultTitle.innerHTML = '✅ Form Submitted Successfully';
+                    resultDetails.innerHTML = `
+                        <p><strong>Honeypot fields were NOT filled - submission allowed!</strong></p>
+                        <div class="field-status">
+                            <div>phone2: <span class="empty">(empty) ✓</span></div>
+                            <div>email2: <span class="empty">(empty) ✓</span></div>
+                        </div>
+                        <p><strong>Regular fields submitted:</strong></p>
+                        <div class="field-status">
+                            <div>Name: ${data.name}</div>
+                            <div>Email: ${data.email}</div>
+                            <div>Phone: ${data.phone}</div>
+                        </div>
+                    `;
+                }
+                
+                // Scroll to results
+                resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             });
-        });
+        }
         
-        // Watch for value changes on honeypot fields
-        const phone2Input = document.getElementById('phone2_hp');
-        const email2Input = document.getElementById('email2_hp');
-        
-        observer.observe(phone2Input, { attributes: true });
-        observer.observe(email2Input, { attributes: true });
-        
-        // Also monitor input events
-        [phone2Input, email2Input].forEach(input => {
-            input.addEventListener('input', function() {
-                console.warn('⚠️ Honeypot field INPUT event detected:', this.id, '=', this.value);
-                alert('⚠️ Honeypot field was just filled: ' + this.id + ' = "' + this.value + '"');
-            });
-        });
+        // Initialize both forms
+        handleFormSubmit('testForm1', 'results1', 'resultTitle1', 'resultDetails1', 'phone2_hp1', 'email2_hp1');
+        handleFormSubmit('testForm2', 'results2', 'resultTitle2', 'resultDetails2', 'phone2_hp2', 'email2_hp2');
     </script>
 </body>
 </html>
