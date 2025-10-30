@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Honeypot Test Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        button:hover {
+            background-color: #0056b3;
+        }
+        
+        .honeypot-container {
+            display: none;
+        }
+        
+        .status {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Honeypot Test Form</h1>
+    <p>Fill out the form and check the console to see what was submitted.</p>
+    
+    <form id="testForm">
+        <!-- Regular visible fields -->
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="phone">Phone:</label>
+            <input type="tel" id="phone" name="phone" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="website">Website:</label>
+            <input type="url" id="website" name="website">
+        </div>
+        
+        <div class="form-group">
+            <label for="age">Age:</label>
+            <input type="number" id="age" name="age" min="1" max="120">
+        </div>
+        
+        <div class="form-group">
+            <label for="message">Message:</label>
+            <textarea id="message" name="message" rows="4"></textarea>
+        </div>
+        
+        <!-- HONEYPOT FIELDS (hidden) -->
+        <div class="honeypot-container">
+            <input type="text" name="email2" autocomplete="off">
+            <input type="text" name="phone2" autocomplete="off">
+        </div>
+        
+        <button type="submit">Submit Form</button>
+    </form>
+    
+    <div class="status" id="status"></div>
+
+    <script>
+        document.getElementById('testForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = {};
+            
+            for (let [key, value] of formData.entries()) {
+                data[key] = value;
+            }
+            
+            console.clear();
+            console.log('=== FORM SUBMISSION ===');
+            console.log('All fields:', data);
+            console.log('\n--- Regular Fields ---');
+            console.log('Name:', data.name);
+            console.log('Email:', data.email);
+            console.log('Phone:', data.phone);
+            console.log('Website:', data.website);
+            console.log('Age:', data.age);
+            console.log('Message:', data.message);
+            
+            console.log('\n--- HONEYPOT Fields (should be empty) ---');
+            console.log('email2:', data.email2 || '(empty)');
+            console.log('phone2:', data.phone2 || '(empty)');
+            
+            // Check if honeypot was triggered
+            const honeypotTriggered = data.email2 || data.phone2;
+            
+            if (honeypotTriggered) {
+                console.log('\n⚠️ HONEYPOT TRIGGERED! Would block this submission.');
+                console.log('Filled honeypot fields:', {
+                    email2: data.email2 || null,
+                    phone2: data.phone2 || null
+                });
+            } else {
+                console.log('\n✅ HONEYPOT PASSED! Submission would be allowed.');
+            }
+            
+            // Update status on page
+            const statusDiv = document.getElementById('status');
+            if (honeypotTriggered) {
+                statusDiv.innerHTML = '<strong style="color: red;">⚠️ HONEYPOT TRIGGERED!</strong><br>Check console for details.';
+            } else {
+                statusDiv.innerHTML = '<strong style="color: green;">✅ Form submitted successfully!</strong><br>Check console for details.';
+            }
+        });
+    </script>
+</body>
+</html>
