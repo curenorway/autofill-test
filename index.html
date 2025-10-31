@@ -41,25 +41,6 @@
             border-bottom: 3px solid #007bff;
         }
         
-        .method-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: bold;
-            margin-left: 10px;
-        }
-        
-        .badge-display-none {
-            background-color: #28a745;
-            color: white;
-        }
-        
-        .badge-opacity {
-            background-color: #ffc107;
-            color: #000;
-        }
-        
         h1 {
             text-align: center;
             color: #333;
@@ -105,13 +86,8 @@
         button:hover {
             background-color: #0056b3;
         }
-        
-        /* Method 1: display: none */
-        .hidden-field-display-none {
-            display: none;
-        }
-        
-        /* Method 2: opacity (client's method) */
+
+        /* Hidden honeypot fields using opacity method */
         .hidden-field-opacity {
             position: absolute !important;
             opacity: 0 !important;
@@ -204,40 +180,39 @@
     <div class="comparison-note">
         <strong>⚠️ Key Difference:</strong>
         <ul style="margin: 10px 0 0 0; padding-left: 20px;">
-            <li><strong>Left form:</strong> Uses <code>display: none</code> (recommended)</li>
-            <li><strong>Right form:</strong> Uses <code>opacity: 0</code> (your client's current setup)</li>
+            <li><strong>Left form:</strong> Honeypot fields HIDDEN with <code>opacity: 0</code> + <code>autocomplete="off"</code></li>
+            <li><strong>Right form:</strong> Honeypot fields VISIBLE (normal fields) + <code>autocomplete="off"</code></li>
+            <li><strong>Goal:</strong> Test if browsers/password managers fill hidden vs visible fields with autocomplete disabled</li>
         </ul>
     </div>
     
     <div class="comparison-grid">
-        <!-- Form 1: display: none -->
+        <!-- Form 1: Hidden honeypot fields -->
         <div class="container">
             <h2>
-                Form 1: display: none
+                Form 1: Hidden Honeypot Fields
             </h2>
-            
+
             <form id="testForm1">
                 <div class="form-group">
                     <label for="name1">Name:</label>
                     <input type="text" id="name1" name="name" placeholder="Enter your name" required>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="email1">Email:</label>
                     <input type="email" id="email1" name="email" placeholder="your@email.com" required>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="phone1">Phone:</label>
                     <input type="tel" id="phone1" name="phone" placeholder="+1 (555) 123-4567" required>
                 </div>
-                
-                <!-- HONEYPOT FIELDS (display: none) -->
-                <div class="hidden-field-display-none">
-                    <input type="text" name="phone2" id="phone2_hp1" class="hidden-field-display-none" autocomplete="off">
-                    <input type="text" name="email2" id="email2_hp1" class="hidden-field-display-none" autocomplete="off">
-                </div>
-                
+
+                <!-- HONEYPOT FIELDS (opacity: 0 - HIDDEN) -->
+                <input type="text" name="phone2" id="phone2_hp1" class="hidden-field-opacity" autocomplete="off">
+                <input type="text" name="email2" id="email2_hp1" class="hidden-field-opacity" autocomplete="off">
+
                 <button type="submit">Submit Form 1</button>
             </form>
             
@@ -247,32 +222,39 @@
             </div>
         </div>
         
-        <!-- Form 2: opacity: 0 (client's method) -->
+        <!-- Form 2: Visible honeypot fields -->
         <div class="container">
             <h2>
-                Form 2: opacity: 0
+                Form 2: Visible Honeypot Fields
             </h2>
-            
+
             <form id="testForm2">
                 <div class="form-group">
                     <label for="name2">Name:</label>
                     <input type="text" id="name2" name="name" placeholder="Enter your name" required>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="email2">Email:</label>
                     <input type="email" id="email2" name="email" placeholder="your@email.com" required>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="phone2">Phone:</label>
                     <input type="tel" id="phone2" name="phone" placeholder="+1 (555) 123-4567" required>
                 </div>
-                
-                <!-- HONEYPOT FIELDS (opacity: 0 - CLIENT'S METHOD) -->
-                <input type="text" name="phone2" id="phone2_hp2" class="hidden-field-opacity" autocomplete="off">
-                <input type="text" name="email2" id="email2_hp2" class="hidden-field-opacity" autocomplete="off">
-                
+
+                <!-- HONEYPOT FIELDS (VISIBLE) -->
+                <div class="form-group">
+                    <label for="phone2_hp2">Phone 2 (honeypot):</label>
+                    <input type="text" name="phone2" id="phone2_hp2" placeholder="Leave this field empty" autocomplete="off">
+                </div>
+
+                <div class="form-group">
+                    <label for="email2_hp2">Email 2 (honeypot):</label>
+                    <input type="text" name="email2" id="email2_hp2" placeholder="Leave this field empty" autocomplete="off">
+                </div>
+
                 <button type="submit">Submit Form 2</button>
             </form>
             
